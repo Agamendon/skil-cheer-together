@@ -1,0 +1,468 @@
+<!DOCTYPE>
+<html>
+<head>
+	<meta charset="UTF-8">
+
+	<title>Panel</title>
+	<script src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
+	 <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- <label class="switch" >
+  <input type="checkbox">
+  <span class="slider"></span>
+</label> -->
+	<div id="main">
+		<div id="logo_block">
+		<p id="logo">Skil Team</p>
+		</div>
+		<div id="seats_block">
+			<div class="seats_table">
+				<div class="col">
+					<div class="row">
+						<div class="s" id="s1"></div>
+						<div class="s" id="s2"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s8"></div>
+						<div class="s" id="s9"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s15"></div>
+						<div class="s" id="s16"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s22"></div>
+						<div class="s" id="s23"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s29"></div>
+						<div class="s" id="s30"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s36"></div>
+						<div class="s" id="s37"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s43"></div>
+						<div class="s" id="s44"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s50"></div>
+						<div class="s" id="s51"></div>
+					</div>
+				</div>
+				<div class="col">
+					<div class="row">
+						<div class="s" id="s3"></div>
+						<div class="s" id="s4"></div>
+						<div class="s" id="s5"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s10"></div>
+						<div class="s" id="s11"></div>
+						<div class="s" id="s12"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s17"></div>
+						<div class="s" id="s18"></div>
+						<div class="s" id="s19"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s24"></div>
+						<div class="s" id="s25"></div>
+						<div class="s" id="s26"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s31"></div>
+						<div class="s" id="s32"></div>
+						<div class="s" id="s33"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s38"></div>
+						<div class="s" id="s39"></div>
+						<div class="s" id="s40"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s45"></div>
+						<div class="s" id="s46"></div>
+						<div class="s" id="s47"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s52"></div>
+						<div class="s" id="s53"></div>
+						<div class="s" id="s54"></div>
+					</div>
+				</div>
+				<div class="col">
+					<div class="row">
+						<div class="s" id="s6"></div>
+						<div class="s" id="s7"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s13"></div>
+						<div class="s" id="s14"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s20"></div>
+						<div class="s" id="s21"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s27"></div>
+						<div class="s" id="s28"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s34"></div>
+						<div class="s" id="s35"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s41"></div>
+						<div class="s" id="s42"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s48"></div>
+						<div class="s" id="s49"></div>
+					</div>
+					<div class="row">
+						<div class="s" id="s55"></div>
+						<div class="s" id="s56"></div>
+					</div>
+				</div>
+			
+			</table>
+			
+		
+		</div>
+		<div id="in_main">
+			<center>
+			<div id="audio_block" style="opacity: 0.2">
+				<div id="sound_container">
+					<img src="mute.png">	
+					<div id="text_sound_container">
+						<div id="text" style="background: #6441A4; border: 1px solid #6441A4; border-radius: 15px; padding: 5px; margin: 5px; color: white; font-weight:600; font-family:'Regular'">
+						Hold to record</div>
+					</div>
+				</div>	
+				<div id="mute_container">
+					<img src="sound_on.png">	
+					<div id="text_sound_container">
+						<div id="text" style="background: #6441A4; border: 1px solid #6441A4; border-radius: 15px; padding: 5px; margin: 5px; color: white; font-weight:600; font-family:'Regular'">Mute all sounds</div>
+					</div>	
+				</div>				
+			</div>
+
+		</div>
+	</div>
+	<script>
+
+	    connection = new WebSocket("ws://localhost:8080");
+
+
+		connection.onopen = function() {
+			$("#audio_block").css("opacity","1");
+			console.log("Connected!");
+			alert("Choose place to sit");
+
+			let msg = {
+				type: "get_matrix",
+			}
+			let json = JSON.stringify(msg);
+			connection.send(json);
+		}
+		let recorder = null;
+
+		const onsuccess = (stream) => {
+		    recorder = new MediaRecorder(stream, {
+		        type: 'audio/ogg; codecs=opus'
+		    });
+	   
+		}
+
+		navigator.getUserMedia = (
+		    navigator.getUserMedia ||
+		    navigator.webkitGetUserMedia ||
+		    navigator.mozGetUserMedia ||
+		    navigator.msGetUserMedia
+		);
+
+		navigator.getUserMedia({
+		    audio: true
+		}, onsuccess, (e) => {
+		    console.log(e);
+		});
+
+
+		var is_sitting = false;
+
+		connection.onmessage = function(e) {
+
+			var s = e.data;
+			console.log(s);
+			if (s.charAt(0) === '1') {
+				s = s.substring(1);
+				updateGrid(s);
+			} else if (s === "sit") {
+				is_sitting == true;
+			} else if (s.charAt(0) === '2') {
+				//get volume (second char)
+
+				var volume = parseInt(s.charAt(1));
+				s = s.substring(2);
+				playBase64String(s, volume);
+			}
+		}
+		//HANDLE buttons
+		
+		function startRec() {
+		    recorder.start(); // Starting the record
+
+	        $("#sound_container #text").text("Recording sound...");
+		    recorder.ondataavailable = (e) => {
+		        // Converting audio blob to base64
+		        let reader = new FileReader()
+		        reader.onloadend = () => {
+		            
+		            // You can upload the base64 to server here.   
+					if (reader.result.length < 3000) {
+						return;
+					} else {
+						//console.log(reader.result);
+						let msg = {
+							type: "send_sound",
+							sound: reader.result,
+						}
+						let json = JSON.stringify(msg);
+						connection.send(json);
+						console.log(json);
+					}
+		        }
+
+		        reader.readAsDataURL(e.data);
+		    }	
+		}
+
+		function stopRec() {
+			setTimeout(function(){
+		    	recorder.stop(); // Stopping the recorder after 3 seconds
+		    	$("#sound_container #text").text("Hold to record");
+			}, 300);
+			//send after 0.2s
+		}
+
+
+		var is_muted = false;
+
+		$(document).ready(function(){
+			var my_timeout = null;
+			$("#sound_container").mousedown(function() {
+
+				if (is_sitting == true) {
+					alert("Choose place to sit");
+					return;
+				}
+
+				startRec();
+			    //setTimeout
+			    my_timeout = setTimeout(stopRec, 5000);	
+			});
+			$("#sound_container").mouseup(function() {
+				clearTimeout(my_timeout);
+				stopRec();
+			});
+
+			$("#mute_container").click(function() {
+				if (is_sitting == true) {
+					alert("Choose place to sit");
+					return;
+				}
+
+				if (is_muted == false) {
+					$("#mute_container img").attr("src","sound_off.png");
+					$("#mute_container #text").text("Unmute all sounds");
+				} else {
+					$("#mute_container img").attr("src","sound_on.png");
+					$("#mute_container #text").text("Mute all sounds");
+				}	
+				is_muted = !is_muted;
+			});
+		});
+
+		function playBase64String(base64string, volume) {
+			if (is_muted == false) {
+				var snd = new Audio(base64string);
+				var new_volume = volume/10.0;s
+				snd.volume = new_volume;
+				snd.play();
+			}
+		}
+
+
+
+		if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+			$("#main").css({
+    			'background-color':'#201c2b'
+    		})
+    		$("#logo").css({
+    			'color':'white'
+    		})
+		}
+		if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+			$("#main").css({
+    			'background-color':'#ffff'
+    		})
+    		$("#logo").css({
+    			'color':'#6441A4'
+    		})
+		}
+		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    		const newColorScheme = e.matches ? "dark" : "light";
+    		if(newColorScheme == "dark"){
+    			$("#main").css({
+    				'background-color':'#201c2b'
+    			})
+    			$("#logo").css({
+    				'color':'white'
+    			})
+    		}
+    		if(newColorScheme == "light"){
+    			$("#main").css({
+    				'background-color':'#ffff'
+    			})
+    			$("#logo").css({
+    				'color':'#6441A4'
+    			})
+    		}
+		});
+
+
+		
+		let book_seat = 0;
+
+		class Sit {
+  			constructor(obj, i, j) {
+    		this.obj = obj;
+		    this.i = i;
+		    this.j = j;
+		  }
+		}
+
+		//fill
+
+		let arr = [];
+		arr[0]=new Sit($("#s1"), 0, 0);
+		arr[1]=new Sit($("#s2"), 0, 1);
+		arr[2]=new Sit($("#s3"), 0, 2);
+		arr[3]=new Sit($("#s4"), 0, 3);
+		arr[4]=new Sit($("#s5"), 0, 4);
+		arr[5]=new Sit($("#s6"), 0, 5);
+		arr[6]=new Sit($("#s7"), 0, 6);
+		arr[7]=new Sit($("#s8"), 1, 0);
+		arr[8]=new Sit($("#s9"), 1, 1);
+		arr[9]=new Sit($("#s10"), 1, 2);
+		arr[10]=new Sit($("#s11"), 1, 3);
+		arr[11]=new Sit($("#s12"), 1, 4);
+		arr[12]=new Sit($("#s13"), 1, 5);
+		arr[13]=new Sit($("#s14"), 1, 6);
+		arr[14]=new Sit($("#s15"), 2, 0);
+		arr[15]=new Sit($("#s16"), 2, 1);
+		arr[16]=new Sit($("#s17"), 2, 2);
+		arr[17]=new Sit($("#s18"), 2, 3);
+		arr[18]=new Sit($("#s19"), 2, 4);
+		arr[19]=new Sit($("#s20"), 2, 5);
+		arr[20]=new Sit($("#s21"), 2, 6);
+		arr[21]=new Sit($("#s22"), 3, 0);
+		arr[22]=new Sit($("#s23"), 3, 1);
+		arr[23]=new Sit($("#s24"), 3, 2);
+		arr[24]=new Sit($("#s25"), 3, 3);
+		arr[25]=new Sit($("#s26"), 3, 4);
+		arr[26]=new Sit($("#s27"), 3, 5);
+		arr[27]=new Sit($("#s28"), 3, 6);
+		arr[28]=new Sit($("#s29"), 4, 0);
+		arr[29]=new Sit($("#s30"), 4, 1);
+		arr[30]=new Sit($("#s31"), 4, 2);
+		arr[31]=new Sit($("#s32"), 4, 3);
+		arr[32]=new Sit($("#s33"), 4, 4);
+		arr[33]=new Sit($("#s34"), 4, 5);
+		arr[34]=new Sit($("#s35"), 4, 6);
+		arr[35]=new Sit($("#s36"), 5, 0);
+		arr[36]=new Sit($("#s37"), 5, 1);
+		arr[37]=new Sit($("#s38"), 5, 2);
+		arr[38]=new Sit($("#s39"), 5, 3);
+		arr[39]=new Sit($("#s40"), 5, 4);
+		arr[40]=new Sit($("#s41"), 5, 5);
+		arr[41]=new Sit($("#s42"), 5, 6);
+		arr[42]=new Sit($("#s43"), 6, 0);
+		arr[43]=new Sit($("#s44"), 6, 1);
+		arr[44]=new Sit($("#s45"), 6, 2);
+		arr[45]=new Sit($("#s46"), 6, 3);
+		arr[46]=new Sit($("#s47"), 6, 4);
+		arr[47]=new Sit($("#s48"), 6, 5);
+		arr[48]=new Sit($("#s49"), 6, 6);
+		arr[49]=new Sit($("#s50"), 7, 0);
+		arr[50]=new Sit($("#s51"), 7, 1);
+		arr[51]=new Sit($("#s52"), 7, 2);
+		arr[52]=new Sit($("#s53"), 7, 3);
+		arr[53]=new Sit($("#s54"), 7, 4);
+		arr[54]=new Sit($("#s55"), 7, 5);
+		arr[55]=new Sit($("#s56"), 7, 6);
+
+	
+		for (var i = 0; i < arr.length; i++) {
+			//arr[i].obj.text(arr[i].i + ', ' + arr[i].j);
+			var sit_i = arr[i].i;
+			var sit_j = arr[i].j;
+			arr[i].obj.click(function(){
+				var sit = getSit($(this).attr('id'));
+				let msg = {
+					type: "set_place",
+					i: sit.i,
+					j: sit.j 
+				}
+				let json = JSON.stringify(msg);
+				connection.send(json);
+				console.log(json);
+			});
+		}
+
+		function getSit(id) {
+			for (var i = 0; i < arr.length; i++) {
+				if (arr[i].obj.attr('id') == id) return arr[i];
+			}
+			return null;
+		}
+
+
+		//update grid
+		function updateGrid(str) {
+			//split str
+			//[i][j][type];
+			//type = 0, 1, 2
+			var lines = str.split(";");
+
+			for (var k = 0; k < lines.length; k++) {
+				var line = lines[k];
+
+				var new_i = parseInt(line.charAt(0));
+				var new_j = parseInt(line.charAt(1));
+				var type = parseInt(line.charAt(2));
+				//console.log(i + " - " + j);
+				//getting object
+				for (var i = 0; i < arr.length; i++) {
+					if (arr[i].i == new_i && arr[i].j == new_j) {
+						var o = arr[i].obj;
+						var color = "lightgray";
+						if (type == 1) {
+							color = "#6441A4";
+						} else if (type == 2) {
+							color = "green";
+						}
+						o.css("background-color",color);
+					}
+				}
+			}
+		}
+
+
+	</script>
+</body>
+</html>
